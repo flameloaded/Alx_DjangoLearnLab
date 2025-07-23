@@ -4,11 +4,12 @@ from .models import Book, Library
 
 # Function-Based View: List all books
 def list_books(request):
-    books = Book.objects.select_related('author').all()
-    return render(request, 'list_books.html', {'books': books})
+    books = Book.objects.all()  # required pattern
+    return render(request, 'relationship_app/list_books.html', {'books': books})  # required pattern
 
-# Class-Based View: Detail of a specific library
+# Class-Based View: Library details
 class LibraryDetailView(DetailView):
     model = Library
-    template_name = 'library_detail.html'
+    template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
+
