@@ -15,6 +15,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from .models import Book
 from django import forms
+from django.contrib.auth.decorators import permission_required
 
 
 
