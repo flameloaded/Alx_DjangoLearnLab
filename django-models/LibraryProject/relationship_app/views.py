@@ -5,10 +5,13 @@ from .models import Library  # required exact import
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.shortcuts import render, redirect
-from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm  # ✅ Add this
 from django.views.generic.detail import DetailView
 from .models import Library, Book
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from .models import UserProfile
+
 
 # Function-Based View: List all books
 def list_books(request):
@@ -28,7 +31,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('home')  # Change to your desired post-login page
+            return redirect('list_books')  # Change to your desired post-login page
     else:
         form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
@@ -36,3 +39,9 @@ def register_view(request):
 
 
 
+
+
+@login_required
+def profile_view(request):
+    profile = request.user.userprofile  # Access related UserProfile directly
+    return render(request, 'relationship_app/profile.html', {'profile': profile})

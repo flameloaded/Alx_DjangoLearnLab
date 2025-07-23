@@ -125,7 +125,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'  # Or any route after successful login
+LOGIN_REDIRECT_URL = 'list_books'  # Or any route after successful login
 LOGOUT_REDIRECT_URL = 'login'
 
 STATIC_URL = '/static/'
