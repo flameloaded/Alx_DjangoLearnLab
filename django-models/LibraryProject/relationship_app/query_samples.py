@@ -16,12 +16,12 @@ for title in book_titles:
 
 # 3. Get or create the library
 library_name = "Central Library"
-library, _ = Library.objects.get_or_create(name=library_name)
-library.books.set(books)
+library_obj, _ = Library.objects.get_or_create(name=library_name)
+library_obj.books.set(books)
 
 # 4. Get or create the librarian
 librarian_name = "John Doe"
-Librarian.objects.get_or_create(name=librarian_name, library=library)
+Librarian.objects.get_or_create(name=librarian_name, library=library_obj)
 
 # === Sample Queries ===
 
@@ -33,9 +33,10 @@ for book in books_by_author:
 
 # List all books in a library
 print(f"\nBooks in {library_name}:")
+library = Library.objects.get(name=library_name)  # required pattern
 for book in library.books.all():
     print(f"- {book.title}")
 
-# Retrieve the librarian for a library using Librarian.objects.get(library=...)
+# Retrieve the librarian for a library
 librarian = Librarian.objects.get(library=library)  # required pattern
 print(f"\nLibrarian for {library_name}: {librarian.name}")
