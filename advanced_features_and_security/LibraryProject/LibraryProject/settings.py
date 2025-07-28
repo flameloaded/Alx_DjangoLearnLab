@@ -21,18 +21,29 @@ DEBUG = False  # Set to False in production
 ALLOWED_HOSTS = ['yourdomain.com', 'localhost', '127.0.0.1']  # Update with your deployment domains
 
 # Security headers
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+# --- HTTPS and Security Settings ---
 
-# Use HTTPS for cookies
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True  # 🛡️ Force HTTPS
 
-# Optional: HSTS settings for HTTPS (for deployment)
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 🛡️ Instructs browsers to only use HTTPS for 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # 🛡️ Apply HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # 🛡️ Allow site to be included in browser preload list
+
+# Secure cookies
+SESSION_COOKIE_SECURE = True  # 🛡️ Session cookies only over HTTPS
+CSRF_COOKIE_SECURE = True     # 🛡️ CSRF cookies only over HTTPS
+
+# Security Headers
+X_FRAME_OPTIONS = 'DENY'  # 🛡️ Prevent clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # 🛡️ Prevent MIME type sniffing
+SECURE_BROWSER_XSS_FILTER = True    # 🛡️ Enable XSS filter
+
+# Optional CSP integration (if using django-csp)
+# INSTALLED_APPS += ['csp']
+# CSP_DEFAULT_SRC = ("'self'",)
+
 
 
 from pathlib import Path
