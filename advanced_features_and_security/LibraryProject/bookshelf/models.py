@@ -2,19 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
-from django.db import models
-
-class Book(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
-    publication_year = models.IntegerField()
-
-    def __str__(self):
-        return f"{self.title} by {self.author}"
-
-
-# Step 1: Custom User Manager
+# =========================
+# Custom User Manager
+# =========================
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
         if not email:
@@ -30,15 +20,16 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
 
-        if extra_fields.get('is_staff') is not True:
+        if not extra_fields.get('is_staff'):
             raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get('is_superuser') is not True:
+        if not extra_fields.get('is_superuser'):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self.create_user(username, email, password, **extra_fields)
 
-
-# Step 2: Custom User Model
+# =========================
+# Custom User Model
+# =========================
 class CustomUser(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', 'Admin'),
@@ -53,8 +44,26 @@ class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
 
-    REQUIRED_FIELDS = ['email']  # Email is required (alongside username & password)
+    REQUIRED_FIELDS = ['email']  # Email is required in addition to username and password
 
     def __str__(self):
         return self.username
 
+# =========================
+# Book Model
+# =========================
+class Book(models.Model):
+    title = models.CharField(max_length=255)
+    author = models.CharField(max_length=255)
+    publication_year = models.PositiveIntegerField()
+
+    class Meta:
+        permissions = [
+            ("can_view", "Can view book"),
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_delete", "Can delete book"),
+        ]
+
+    def __str__(self):
+        return self.title

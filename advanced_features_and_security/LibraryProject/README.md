@@ -84,3 +84,32 @@ Feel free to fork or clone this repository to kickstart your own Django learning
 Pull requests and suggestions are always welcome.
 
 ⭐ Happy learning and coding with Django! ⭐
+
+
+# Django Permissions and Groups Setup
+
+### Custom Permissions
+Defined in `Book` model:
+- `can_view` – View book entries
+- `can_create` – Create new books
+- `can_edit` – Edit existing books
+- `can_delete` – Delete books
+
+### Groups
+- **Viewers**: Only `can_view`
+- **Editors**: `can_view`, `can_create`, `can_edit`
+- **Admins**: All permissions
+
+### Views & Access Control
+Views are protected using `@permission_required`:
+- `book_list` → `can_view`
+- `book_create` → `can_create`
+- `book_edit` → `can_edit`
+- `book_delete` → `can_delete`
+
+### How to Set Up
+Run this inside `python manage.py shell`:
+
+```python
+from bookshelf.permissions_setup import setup_groups_and_permissions
+setup_groups_and_permissions()
