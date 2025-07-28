@@ -1,5 +1,9 @@
-# forms.py
-from django import forms
+# LibraryProject/bookshelf/forms.py
 
-class BookSearchForm(forms.Form):
-    title = forms.CharField(max_length=100, required=False)
+from django import forms
+from .models import Book  # or any model you're working with
+
+class ExampleForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ['title', 'author', 'publication_year']  # adjust based on your Book model fields

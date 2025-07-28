@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # views.py
 from django.shortcuts import render
-from .forms import BookSearchForm
+from .forms import ExampleForm
 from .models import Book
 # Create your views here.
 # bookshelf/views.py
@@ -46,7 +46,7 @@ def book_delete(request, book_id):
 
 
 def search_books(request):
-    form = BookSearchForm(request.GET or None)
+    form = ExampleForm(request.GET or None)
     results = []
 
     if form.is_valid():
