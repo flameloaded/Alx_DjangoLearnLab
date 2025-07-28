@@ -1,5 +1,9 @@
 from django.shortcuts import render
 
+# views.py
+from django.shortcuts import render
+from .forms import BookSearchForm
+from .models import Book
 # Create your views here.
 # bookshelf/views.py
 
@@ -38,3 +42,15 @@ def book_delete(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     return redirect('book_list')
+
+
+
+def search_books(request):
+    form = BookSearchForm(request.GET or None)
+    results = []
+
+    if form.is_valid():
+        title = form.cleaned_data['title']
+        results = Book.objects.filter(title__icontains=title)
+
+    return render(request, 'bookshelf/book_list.html', {'form': form, 'results': results})
