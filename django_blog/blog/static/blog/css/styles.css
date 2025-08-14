@@ -1,0 +1,7 @@
+body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+nav a { margin-right: 1rem; }
+.messages { list-style: none; padding: 0; }
+.messages li { background: #eef; margin: .5rem 0; padding: .5rem .75rem; border-radius: .25rem; }
+form p { display: grid; grid-template-columns: 140px 1fr; gap: .5rem; align-items: center; }
+form input, form textarea, form select { padding: .4rem; }
+button { padding: .5rem .8rem; cursor: pointer; }

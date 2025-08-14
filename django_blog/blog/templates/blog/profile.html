@@ -1,0 +1,21 @@
+{% extends "blog/base.html" %}
+{% block title %}Your Profile{% endblock %}
+{% block content %}
+<h1>Your Profile</h1>
+
+<form method="post" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+  <fieldset>
+    <legend>Account</legend>
+    {{ u_form.as_p }}
+  </fieldset>
+  <fieldset>
+    <legend>Profile</legend>
+    {% if request.user.profile.image %}
+      <p><img src="{{ request.user.profile.image.url }}" alt="Profile picture" style="max-width:150px;"></p>
+    {% endif %}
+    {{ p_form.as_p }}
+  </fieldset>
+  <button type="submit">Save changes</button>
+</form>
+{% endblock %}
