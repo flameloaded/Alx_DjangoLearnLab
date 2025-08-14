@@ -24,7 +24,7 @@ def index(request):
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 
 class UserLoginView(LoginView):
-    template_name = "registration/login.html"
+    template_name = "blog/login.html"
     # Django handles CSRF, invalid creds messages via form errors
 
 class UserLogoutView(LogoutView):
