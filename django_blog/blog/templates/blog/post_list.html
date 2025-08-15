@@ -12,6 +12,8 @@
       <p class="meta">By {{ post.author.username }} • {{ post.published_date|date:"M j, Y H:i" }}</p>
       <p>{{ post.content|truncatechars:200 }}</p>
       <a href="{% url 'post-detail' post.pk %}">Read more</a>
+
+      
     </article>
   {% empty %}
     <p>No posts yet.</p>
