@@ -31,7 +31,7 @@
   {% endfor %}
 
   {% if user.is_authenticated %}
-    <form method="POST" action="{% url 'comment-add' post.pk %}">
+    <form method="POST" action="{% url 'comment-create' post.pk %}">
       {% csrf_token %}
       {{ form.as_p }}
       <button type="submit">Add Comment</button>
