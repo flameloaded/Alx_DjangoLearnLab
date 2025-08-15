@@ -6,13 +6,10 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment
+from .models import Post, Comment, Tag
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm, CommentForm
-
-
-# Create your views here.
+from django.db.models import Q
 from django.http import HttpResponse
-
 from django.shortcuts import render
 
 
@@ -76,9 +73,52 @@ def profile(request):
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/post_list.html'   # blog/templates/blog/post_list.html
+    template_name = 'blog/home.html'
     context_object_name = 'posts'
     paginate_by = 10
+    ordering = ['-published_date']
+
+    def get_queryset(self):
+        qs = super().get_queryset().select_related('author').prefetch_related('tags')
+        # Support query param ?q=... (search)
+        q = self.request.GET.get('q')
+        if q:
+            qs = qs.filter(
+                Q(title__icontains=q) |
+                Q(content__icontains=q) |
+                Q(tags__name__icontains=q)
+            ).distinct()
+        return qs
+
+class PostsByTagView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, slug=self.kwargs['slug'])
+        return Post.objects.filter(tags=tag).select_related('author').prefetch_related('tags').order_by('-published_date')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['tag'] = get_object_or_404(Tag, slug=self.kwargs['slug'])
+        return ctx
+
+
+# --- Optional dedicated search view (if you prefer /search/ over ?q=) ---
+
+def search(request):
+    q = request.GET.get('q', '')
+    posts = Post.objects.all()
+    if q:
+        posts = posts.filter(
+            Q(title__icontains=q) |
+            Q(content__icontains=q) |
+            Q(tags__name__icontains=q)
+        ).distinct()
+    return render(request, 'blog/search_results.html', {'posts': posts, 'query': q})
+
 
 # Single post detail - public
 class PostDetailView(DetailView):
