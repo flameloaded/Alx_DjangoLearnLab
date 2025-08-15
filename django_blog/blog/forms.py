@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Profile, Post, Comment, Tag
+from .models import Profile, Post, Comment
 
 
 class UserRegisterForm(UserCreationForm):
@@ -20,7 +20,6 @@ class UserRegisterForm(UserCreationForm):
 
 
 class PostForm(forms.ModelForm):
-    # free-text comma-separated input
     tags_csv = forms.CharField(
         required=False,
         help_text="Comma-separated tags, e.g. django, api, tips",
@@ -29,19 +28,18 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'tags_csv']  # 'tags' handled via tags_csv
+        fields = ['title', 'content', 'tags_csv']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Prefill tags_csv on edit
         if self.instance.pk:
-            current = self.instance.tags.values_list('name', flat=True)
+            current = self.instance.tags.names()  # get list of tag names
             self.fields['tags_csv'].initial = ', '.join(current)
 
     def clean_tags_csv(self):
         raw = self.cleaned_data.get('tags_csv', '')
-        # normalize: split, strip, remove empties & dedupe (case-insensitive)
         parts = [t.strip() for t in raw.split(',') if t.strip()]
+        # remove duplicates (case-insensitive)
         dedup = []
         seen = set()
         for p in parts:
@@ -53,20 +51,12 @@ class PostForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
-        # Attach tags after instance exists
-        tags_list = self.cleaned_data.get('cleaned_tags', None)
-        if tags_list is None:
-            tags_list = self.cleaned_data.get('tags_csv', [])
-        tag_objs = []
-        for name in tags_list:
-            tag, _ = Tag.objects.get_or_create(name=name)
-            tag_objs.append(tag)
-        # set many-to-many
-        # If commit=False on first save, we need instance.save() before m2m
+        tags_list = self.cleaned_data.get('tags_csv', [])
         if not instance.pk:
-            instance.save()
-        instance.tags.set(tag_objs)
+            instance.save()  # make sure instance exists
+        instance.tags.set(tags_list)  # <-- only one positional argument
         return instance
+
 
 
 class UserUpdateForm(forms.ModelForm):

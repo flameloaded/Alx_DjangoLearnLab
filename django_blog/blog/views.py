@@ -6,11 +6,12 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post, Comment, Tag
+from .models import Post, Comment
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm, CommentForm
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
+from taggit.models import Tag 
 
 
 
