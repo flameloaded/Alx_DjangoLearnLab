@@ -1,5 +1,21 @@
 {% extends "blog/base.html" %}
 {% block content %}
-    <h2>Welcome to Django Blog!</h2>
-    <p>This is the home page.</p>
+    <h2>Welcome to HaySam Blog!</h2>
+
+    {% for post in posts %}
+        <div style="border: 1px solid #ddd; margin: 10px; padding: 10px;">
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.content|truncatewords:30 }}</p>
+            <small>By {{ post.author }} on {{ post.date_posted|date:"F d, Y" }}</small><br>
+
+            <!-- Only show edit/delete if current user is the author -->
+            {% if user == post.author %}
+                <a href="{% url 'post-update' post.id %}">Edit</a>
+                <a href="{% url 'post-delete' post.id %}">Delete</a>
+                <a href="{% url 'post-detail' post.id %}">View</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>No posts yet.</p>
+    {% endfor %}
 {% endblock %}
