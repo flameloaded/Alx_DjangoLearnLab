@@ -127,7 +127,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 # Add Comment View
-class AddCommentView(LoginRequiredMixin, View):
+class CommentCreateView(LoginRequiredMixin, View):
     def post(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
         form = CommentForm(request.POST)
