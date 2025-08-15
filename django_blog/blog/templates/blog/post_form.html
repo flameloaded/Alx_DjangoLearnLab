@@ -3,20 +3,11 @@
   <h1>{% if form.instance.pk %}Edit Post{% else %}New Post{% endif %}</h1>
 
   <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">{% if form.instance.pk %}Save changes{% else %}Publish{% endif %}</button>
+</form>
 
-    <!-- If you want to display tags separately -->
-    {% if form.tags %}
-      <p>
-        <label for="{{ form.tags.id_for_label }}">Tags:</label>
-        {{ form.tags }}
-        <small>Hold Ctrl (Cmd on Mac) to select multiple tags</small>
-      </p>
-    {% endif %}
-
-    <button type="submit">{% if form.instance.pk %}Save changes{% else %}Publish{% endif %}</button>
-  </form>
 
   <p><a href="{% url 'blog-home' %}">Cancel</a></p>
 {% endblock %}
