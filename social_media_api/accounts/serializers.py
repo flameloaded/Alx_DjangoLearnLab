@@ -4,20 +4,23 @@ from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)  # ALX requires this line
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Explicitly define password field as write-only
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
-        # ALX requires get_user_model().objects.create_user
-        user = get_user_model().objects.create_user(
+        # Create user securely using create_user method
+        user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data['email'],
+            email=validated_data.get('email', ''),
             password=validated_data['password']
         )
-        # ALX requires Token.objects.create
+
+        # Automatically create a token for this user
         Token.objects.create(user=user)
+
         return user
