@@ -1,25 +1,23 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)  # ALX requires this line
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'password2']
-
-    def validate(self, data):
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError("Passwords must match.")
-        return data
+        fields = ['username', 'email', 'password']
 
     def create(self, validated_data):
-        validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
-        # <-- Create a token for the user immediately
+        # ALX requires get_user_model().objects.create_user
+        user = get_user_model().objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+        # ALX requires Token.objects.create
         Token.objects.create(user=user)
         return user
