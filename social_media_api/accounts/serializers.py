@@ -10,12 +10,15 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def create(self, validated_data):
-        # Explicitly using get_user_model().objects.create_user (not User.objects.create_user)
         user = get_user_model().objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password']
         )
-        # Explicitly using Token.objects.create
         Token.objects.create(user=user)
         return user
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
