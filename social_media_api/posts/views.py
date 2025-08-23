@@ -1,15 +1,16 @@
-from rest_framework import viewsets, permissions
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from rest_framework import filters
 from django.shortcuts import get_object_or_404
-from .models import Post, Like
-from .serializers import PostSerializer, LikeSerializer
 from notifications.models import Notification
 from django.contrib.contenttypes.models import ContentType
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from django.db.models import Q
+
+
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -82,3 +83,19 @@ class UnlikePostView(APIView):
             return Response({'detail': 'You have not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
         like.delete()
         return Response({'detail': 'Post unliked'}, status=status.HTTP_200_OK)
+    
+
+
+
+class FeedView(ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        # Posts from people I follow (and optionally include my own posts)
+        return (
+            Post.objects
+            .filter(Q(author__in=user.following.all()) | Q(author=user))
+            .order_by("-created_at")
+        )

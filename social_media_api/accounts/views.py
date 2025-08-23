@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer, UserSerializer
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status
 
 User = get_user_model()
 
@@ -37,3 +39,40 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class FollowUserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, id=user_id)
+        if target == request.user:
+            return Response({"detail": "You cannot follow yourself."}, status=400)
+        # ManyToMany prevents duplicates automatically
+        request.user.following.add(target)
+        return Response(
+            {
+                "detail": f"You are now following {target.username}.",
+                "you": UserSerializer(request.user).data,
+                "target": UserSerializer(target).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+    
+
+class UnfollowUserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        target = get_object_or_404(User, id=user_id)
+        if target == request.user:
+            return Response({"detail": "You cannot unfollow yourself."}, status=400)
+        request.user.following.remove(target)
+        return Response(
+            {
+                "detail": f"You unfollowed {target.username}.",
+                "you": UserSerializer(request.user).data,
+                "target": UserSerializer(target).data,
+            },
+            status=status.HTTP_200_OK,
+        )
