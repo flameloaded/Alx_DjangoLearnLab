@@ -86,16 +86,11 @@ class UnlikePostView(APIView):
     
 
 
-
-class FeedView(ListAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+class FeedView(generics.ListAPIView):
     serializer_class = PostSerializer
 
     def get_queryset(self):
         user = self.request.user
-        # Posts from people I follow (and optionally include my own posts)
-        return (
-            Post.objects
-            .filter(Q(author__in=user.following.all()) | Q(author=user))
-            .order_by("-created_at")
-        )
+        following_users = user.following.all()
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')
+
