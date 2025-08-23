@@ -1,15 +1,11 @@
 from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer, LikeSerializer
-from rest_framework import filters
-from django.shortcuts import get_object_or_404
-from notifications.models import Notification
-from django.contrib.contenttypes.models import ContentType
-from rest_framework import generics, permissions, status, viewsets
+from rest_framework import filters, generics, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.generics import ListAPIView
+from notifications.models import Notification
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -29,8 +25,6 @@ class PostLikeListView(generics.ListAPIView):
         return Like.objects.filter(post_id=post_id)
 
 
-
-
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
@@ -40,7 +34,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -56,8 +49,8 @@ class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
-        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        post = generics.get_object_or_404(Post, pk=pk)
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
         if not created:
             return Response({'detail': 'Already liked'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -77,13 +70,12 @@ class UnlikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+        post = generics.get_object_or_404(Post, pk=pk)
         like = Like.objects.filter(post=post, user=request.user)
         if not like.exists():
             return Response({'detail': 'You have not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
         like.delete()
         return Response({'detail': 'Post unliked'}, status=status.HTTP_200_OK)
-    
 
 
 class FeedView(generics.ListAPIView):
@@ -93,4 +85,3 @@ class FeedView(generics.ListAPIView):
         user = self.request.user
         following_users = user.following.all()
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
-
